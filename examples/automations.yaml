@@ -1,0 +1,131 @@
+# Example automations for McIntosh C55/C2800 integration
+
+# Turn on amplifier in the morning
+- alias: "Morning Audio System"
+  description: "Turn on McIntosh and set to preferred source"
+  trigger:
+    - platform: time
+      at: "07:00:00"
+  action:
+    - service: media_player.turn_on
+      target:
+        entity_id: media_player.mcintosh_c2800_192_168_1_100
+    - delay:
+        seconds: 2
+    - service: media_player.select_source
+      target:
+        entity_id: media_player.mcintosh_c2800_192_168_1_100
+      data:
+        source: "BAL 1"
+    - service: media_player.volume_set
+      target:
+        entity_id: media_player.mcintosh_c2800_192_168_1_100
+      data:
+        volume_level: 0.25
+
+# Turn off amplifier at night
+- alias: "Night Audio System Off"
+  description: "Turn off McIntosh at night"
+  trigger:
+    - platform: time
+      at: "23:00:00"
+  action:
+    - service: media_player.turn_off
+      target:
+        entity_id: media_player.mcintosh_c2800_192_168_1_100
+
+# Reduce volume when phone rings
+- alias: "Phone Ring Volume Down"
+  description: "Lower volume when phone rings"
+  trigger:
+    - platform: state
+      entity_id: sensor.phone_state
+      to: "ringing"
+  action:
+    - service: media_player.volume_set
+      target:
+        entity_id: media_player.mcintosh_c2800_192_168_1_100
+      data:
+        volume_level: 0.15
+
+# Restore volume after phone call
+- alias: "Phone End Volume Restore"
+  description: "Restore volume after phone call"
+  trigger:
+    - platform: state
+      entity_id: sensor.phone_state
+      to: "idle"
+  action:
+    - service: media_player.volume_set
+      target:
+        entity_id: media_player.mcintosh_c2800_192_168_1_100
+      data:
+        volume_level: 0.4
+
+# Switch to TV input when TV is turned on
+- alias: "TV On - Switch Input"
+  description: "Switch McIntosh to TV input when TV is on"
+  trigger:
+    - platform: state
+      entity_id: media_player.living_room_tv
+      to: "on"
+  action:
+    - service: media_player.turn_on
+      target:
+        entity_id: media_player.mcintosh_c2800_192_168_1_100
+    - delay:
+        seconds: 1
+    - service: media_player.select_source
+      target:
+        entity_id: media_player.mcintosh_c2800_192_168_1_100
+      data:
+        source: "OPT 1"
+
+# Movie night scene
+- alias: "Movie Night"
+  description: "Prepare audio system for movie night"
+  trigger:
+    - platform: event
+      event_type: scene_activated
+      event_data:
+        scene: movie_night
+  action:
+    - service: media_player.turn_on
+      target:
+        entity_id: media_player.mcintosh_c2800_192_168_1_100
+    - delay:
+        seconds: 2
+    - service: media_player.select_source
+      target:
+        entity_id: media_player.mcintosh_c2800_192_168_1_100
+      data:
+        source: "COAX 1"
+    - service: media_player.volume_set
+      target:
+        entity_id: media_player.mcintosh_c2800_192_168_1_100
+      data:
+        volume_level: 0.55
+
+# Vinyl listening mode
+- alias: "Vinyl Time"
+  description: "Set up for vinyl listening"
+  trigger:
+    - platform: state
+      entity_id: input_boolean.vinyl_mode
+      to: "on"
+  action:
+    - service: media_player.turn_on
+      target:
+        entity_id: media_player.mcintosh_c2800_192_168_1_100
+    - delay:
+        seconds: 2
+    - service: media_player.select_source
+      target:
+        entity_id: media_player.mcintosh_c2800_192_168_1_100
+      data:
+        source: "PHONO 1"
+    - service: media_player.volume_set
+      target:
+        entity_id: media_player.mcintosh_c2800_192_168_1_100
+      data:
+        volume_level: 0.35
