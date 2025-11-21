@@ -65,10 +65,10 @@ class McIntoshC2800MediaPlayer(CoordinatorEntity, MediaPlayerEntity):
         """Return the state of the device."""
         if not self.coordinator.client.connected:
             return MediaPlayerState.OFF
-        
+
         if self.coordinator.data and self.coordinator.data.get("power"):
             return MediaPlayerState.ON
-        
+
         return MediaPlayerState.OFF
 
     @property

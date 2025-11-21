@@ -58,13 +58,16 @@ class McIntoshC2800Coordinator(DataUpdateCoordinator):
             _LOGGER.warning("Connection lost, will attempt to reconnect")
             self._schedule_reconnect()
         else:
-            # Update Home Assistant with new data
-            self.async_set_updated_data({
-                "power": self.client.power,
-                "volume": self.client.volume,
-                "muted": self.client.is_muted,
-                "source": self.client.source,
-            })
+            # Update Home Assistant with new data (this is thread-safe in Home Assistant)
+            self.hass.loop.call_soon_threadsafe(
+                self.async_set_updated_data,
+                {
+                    "power": self.client.power,
+                    "volume": self.client.volume,
+                    "muted": self.client.is_muted,
+                    "source": self.client.source,
+                }
+            )
 
     def _schedule_reconnect(self):
         """Schedule a reconnection attempt."""
