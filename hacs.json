@@ -1,5 +1,6 @@
 {
   "name": "McIntosh C55/C2800 Preamplifier",
   "render_readme": true,
-  "homeassistant": "2023.1.0"
+  "homeassistant": "2023.1.0",
+  "version": "1.0.0"
 }
