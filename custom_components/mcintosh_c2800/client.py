@@ -53,7 +53,8 @@ class McIntoshC2800Client:
             
             # Query initial status after connection
             _LOGGER.debug("Querying initial status after connection")
-            await self.query_status()
+            if not await self.query_status():
+                _LOGGER.warning("Failed to query initial status, but connection established")
             
             return True
         except (asyncio.TimeoutError, OSError, ConnectionError) as err:
