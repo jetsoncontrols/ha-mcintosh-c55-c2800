@@ -95,39 +95,41 @@ class McIntoshC2800MediaPlayer(CoordinatorEntity, MediaPlayerEntity):
 
     async def async_turn_on(self) -> None:
         """Turn the media player on."""
-        await self.coordinator.client.power_on()
-        await self.coordinator.async_request_refresh()
+        if await self.coordinator.client.power_on():
+            await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self) -> None:
         """Turn the media player off."""
-        await self.coordinator.client.power_off()
-        await self.coordinator.async_request_refresh()
+        if await self.coordinator.client.power_off():
+            await self.coordinator.async_request_refresh()
 
     async def async_set_volume_level(self, volume: float) -> None:
         """Set volume level, range 0..1."""
         volume_percent = int(volume * 100)
-        await self.coordinator.client.set_volume(volume_percent)
-        await self.coordinator.async_request_refresh()
+        if await self.coordinator.client.set_volume(volume_percent):
+            await self.coordinator.async_request_refresh()
 
     async def async_volume_up(self) -> None:
         """Volume up the media player."""
-        await self.coordinator.client.volume_up()
-        await self.coordinator.async_request_refresh()
+        if await self.coordinator.client.volume_up():
+            await self.coordinator.async_request_refresh()
 
     async def async_volume_down(self) -> None:
         """Volume down the media player."""
-        await self.coordinator.client.volume_down()
-        await self.coordinator.async_request_refresh()
+        if await self.coordinator.client.volume_down():
+            await self.coordinator.async_request_refresh()
 
     async def async_mute_volume(self, mute: bool) -> None:
         """Mute the volume."""
+        success = False
         if mute:
-            await self.coordinator.client.mute_on()
+            success = await self.coordinator.client.mute_on()
         else:
-            await self.coordinator.client.mute_off()
-        await self.coordinator.async_request_refresh()
+            success = await self.coordinator.client.mute_off()
+        if success:
+            await self.coordinator.async_request_refresh()
 
     async def async_select_source(self, source: str) -> None:
         """Select input source."""
-        await self.coordinator.client.select_source(source)
-        await self.coordinator.async_request_refresh()
+        if await self.coordinator.client.select_source(source):
+            await self.coordinator.async_request_refresh()
