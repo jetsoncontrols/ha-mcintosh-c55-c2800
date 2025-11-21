@@ -1,0 +1,22 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "McIntosh C2800 Setup",
+        "description": "Configure your McIntosh C2800 preamplifier",
+        "data": {
+          "host": "IP Address",
+          "port": "Port"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the device. Please check the IP address and port.",
+      "timeout": "Connection timeout. Please check if the device is powered on and network is accessible.",
+      "unknown": "An unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "Device is already configured"
+    }
+  }
+}
