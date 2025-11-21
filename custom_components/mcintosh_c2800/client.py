@@ -51,6 +51,11 @@ class McIntoshC2800Client:
             # an async context already running on the hass event loop
             self._read_task = asyncio.create_task(self._read_responses())
             
+            # Query initial status after connection
+            _LOGGER.debug("Querying initial status after connection")
+            if not await self.query_status():
+                _LOGGER.warning("Failed to query initial status, but connection established")
+            
             return True
         except (asyncio.TimeoutError, OSError, ConnectionError) as err:
             _LOGGER.error("Failed to connect to %s:%s: %s", self.host, self.port, err)
