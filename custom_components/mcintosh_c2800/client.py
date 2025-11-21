@@ -86,17 +86,42 @@ class McIntoshC2800Client:
 
     async def _read_responses(self):
         """Background task to read responses from the device."""
+        buffer = ""
         try:
             while self._connected and self._reader:
                 try:
-                    line = await self._reader.readuntil(b'\r\n')
-                    response = line.decode('ascii').strip()
-                    if response:
-                        _LOGGER.debug("Received: %s", response)
-                        self._parse_response(response)
-                except asyncio.IncompleteReadError:
-                    _LOGGER.warning("Connection closed by device")
-                    break
+                    # Read available data
+                    data = await self._reader.read(1024)
+                    if not data:
+                        _LOGGER.warning("Connection closed by device")
+                        break
+                    
+                    # Decode and add to buffer
+                    buffer += data.decode('ascii', errors='ignore')
+                    
+                    # Process all complete messages in buffer (messages wrapped in parentheses)
+                    while '(' in buffer and ')' in buffer:
+                        start_idx = buffer.find('(')
+                        end_idx = buffer.find(')', start_idx)
+                        
+                        if start_idx != -1 and end_idx != -1:
+                            # Extract message without parentheses
+                            message = buffer[start_idx + 1:end_idx]
+                            # Remove processed message from buffer
+                            buffer = buffer[end_idx + 1:]
+                            
+                            if message:
+                                _LOGGER.debug("Received: (%s)", message)
+                                self._parse_response(message)
+                        else:
+                            # No complete message yet
+                            break
+                    
+                    # Clear buffer if it gets too large (safety measure)
+                    if len(buffer) > 4096:
+                        _LOGGER.warning("Buffer overflow, clearing: %s", buffer[:100])
+                        buffer = ""
+                        
                 except Exception as err:
                     _LOGGER.error("Error reading response: %s", err)
                     break
@@ -109,10 +134,8 @@ class McIntoshC2800Client:
 
     def _parse_response(self, response: str):
         """Parse a response from the device."""
-        # Remove parentheses if present
+        # Response is already without parentheses
         response = response.strip()
-        if response.startswith('(') and response.endswith(')'):
-            response = response[1:-1]
         
         parts = response.split()
         if not parts:
