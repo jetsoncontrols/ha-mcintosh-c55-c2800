@@ -77,7 +77,7 @@ class McIntoshC2800Coordinator(DataUpdateCoordinator):
         if not self._should_reconnect:
             return
         
-        self._reconnect_task = asyncio.create_task(self._reconnect_loop())
+        self._reconnect_task = self.hass.async_create_task(self._reconnect_loop())
 
     async def _reconnect_loop(self):
         """Reconnection loop."""

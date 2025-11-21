@@ -1,9 +1,9 @@
 {% if installed %}
-## Changes in Version {{version_installed}}
+## Currently Installed: Version {{version_installed}}
 
-{% if version_installed.replace("v", "").replace(".","") | int < 100  %}
-### Breaking Changes
-This is the initial release.
+{% if version_installed == "1.0.0" or version_installed == "v1.0.0" %}
+### Initial Release
+This is the first version of the integration.
 {% endif %}
 
 ---

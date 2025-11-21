@@ -47,6 +47,8 @@ class McIntoshC2800Client:
             _LOGGER.info("Connected to McIntosh C2800 at %s:%s", self.host, self.port)
             
             # Start background task to read responses
+            # Using asyncio.create_task is safe here as this is called from
+            # an async context already running on the hass event loop
             self._read_task = asyncio.create_task(self._read_responses())
             
             return True
