@@ -56,6 +56,8 @@ class McIntoshC2800Coordinator(DataUpdateCoordinator):
         if not self.client.connected:
             # Connection lost, schedule reconnection
             _LOGGER.warning("Connection lost, will attempt to reconnect")
+            # Trigger entity update to reflect unavailable state
+            self.hass.loop.call_soon_threadsafe(self.async_update_listeners)
             self._schedule_reconnect()
         else:
             # Update Home Assistant with new data (this is thread-safe in Home Assistant)
@@ -88,6 +90,8 @@ class McIntoshC2800Coordinator(DataUpdateCoordinator):
             try:
                 if await self.client.connect():
                     _LOGGER.info("Reconnected successfully")
+                    # Trigger entity update to reflect available state
+                    self.async_update_listeners()
                     # Query initial status after reconnection
                     await self.client.query_status()
                     self._handle_status_update()
