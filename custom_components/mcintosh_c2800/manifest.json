@@ -1,0 +1,11 @@
+{
+  "domain": "mcintosh_c2800",
+  "name": "McIntosh C2800 Preamplifier",
+  "codeowners": ["@jetsoncontrols"],
+  "config_flow": true,
+  "documentation": "https://github.com/jetsoncontrols/ha-mcintosh-c55-c2800",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/jetsoncontrols/ha-mcintosh-c55-c2800/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}
