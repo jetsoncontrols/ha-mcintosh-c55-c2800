@@ -109,6 +109,11 @@ class McIntoshC2800Client:
 
     def _parse_response(self, response: str):
         """Parse a response from the device."""
+        # Remove parentheses if present
+        response = response.strip()
+        if response.startswith('(') and response.endswith(')'):
+            response = response[1:-1]
+        
         parts = response.split()
         if not parts:
             return
@@ -147,12 +152,12 @@ class McIntoshC2800Client:
         
         async with self._lock:
             try:
-                _LOGGER.debug("Sending command: %s", command)
-                self._writer.write(f"{command}\r\n".encode('ascii'))
+                _LOGGER.debug("Sending command: (%s)", command)
+                self._writer.write(f"({command})\r\n".encode('ascii'))
                 await self._writer.drain()
                 return True
             except Exception as err:
-                _LOGGER.error("Error sending command '%s': %s", command, err)
+                _LOGGER.error("Error sending command '(%s)': %s", command, err)
                 self._connected = False
                 return False
 
