@@ -15,7 +15,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, INPUT_SOURCES
+from .const import DOMAIN, INPUT_SOURCES, INPUT_SOURCE_MAP, INPUT_SOURCE_REVERSE_MAP
 from .coordinator import McIntoshC2800Coordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -90,7 +90,10 @@ class McIntoshC2800MediaPlayer(CoordinatorEntity, MediaPlayerEntity):
     def source(self) -> str | None:
         """Return the current input source."""
         if self.coordinator.data:
-            return self.coordinator.data.get("source")
+            protocol_source = self.coordinator.data.get("source")
+            # Convert protocol number to human-readable name
+            if protocol_source:
+                return INPUT_SOURCE_REVERSE_MAP.get(protocol_source, protocol_source)
         return None
 
     async def async_turn_on(self) -> None:
@@ -131,5 +134,7 @@ class McIntoshC2800MediaPlayer(CoordinatorEntity, MediaPlayerEntity):
 
     async def async_select_source(self, source: str) -> None:
         """Select input source."""
-        if await self.coordinator.client.select_source(source):
+        # Convert display name to protocol command number
+        protocol_command = INPUT_SOURCE_MAP.get(source, source)
+        if await self.coordinator.client.select_source(protocol_command):
             await self.coordinator.async_request_refresh()
