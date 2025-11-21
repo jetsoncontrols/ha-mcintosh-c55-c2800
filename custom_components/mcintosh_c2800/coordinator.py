@@ -23,7 +23,7 @@ class McIntoshC2800Coordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(seconds=30),
+            update_interval=timedelta(seconds=10),
         )
         self.client = McIntoshC2800Client(
             host=host,
@@ -37,12 +37,23 @@ class McIntoshC2800Coordinator(DataUpdateCoordinator):
         """Fetch data from the device."""
         if not self.client.connected:
             # Try to connect if not connected
-            if not await self.client.connect():
-                raise UpdateFailed("Not connected to device")
+            try:
+                if not await self.client.connect():
+                    # Trigger reconnection attempt
+                    self._schedule_reconnect()
+                    raise UpdateFailed("Not connected to device")
+            except Exception as err:
+                _LOGGER.error("Connection failed: %s", err)
+                self._schedule_reconnect()
+                raise UpdateFailed(f"Connection failed: {err}")
         
         # Query status
-        if not await self.client.query_status():
-            raise UpdateFailed("Failed to query device status")
+        try:
+            if not await self.client.query_status():
+                raise UpdateFailed("Failed to query device status")
+        except Exception as err:
+            _LOGGER.error("Failed to query status: %s", err)
+            raise UpdateFailed(f"Failed to query device status: {err}")
         
         return {
             "power": self.client.power,

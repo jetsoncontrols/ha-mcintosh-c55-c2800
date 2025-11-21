@@ -182,6 +182,9 @@ class McIntoshC2800Client:
             except Exception as err:
                 _LOGGER.error("Error sending command '(%s)': %s", command, err)
                 self._connected = False
+                # Notify about connection loss
+                if self._status_callback:
+                    self._status_callback()
                 return False
 
     async def power_on(self) -> bool:
